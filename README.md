@@ -1,10 +1,10 @@
-# 🧥 FashionMNIST CNN Classifier
+# FashionMNIST CNN Classifier
 
 A Convolutional Neural Network (CNN) built with **PyTorch** to classify clothing images from the [FashionMNIST dataset](https://github.com/zalandoresearch/fashion-mnist).
 
 ---
 
-## 🚀 Features
+##  Features
 - Implemented a custom CNN with **two convolutional blocks** and a linear classifier  
 - Trained on FashionMNIST with **~90% test accuracy** after 5 epochs  
 - Visualized training loss/accuracy curves  
@@ -24,11 +24,8 @@ A Convolutional Neural Network (CNN) built with **PyTorch** to classify clothing
 
 ---
 
-## ⚙️ Setup
+## Setup
 
-Clone this repository and install the required dependencies:
+Clone this repository and install the required dependencies.
 
-```bash
-git clone https://github.com/yourusername/FashionMNIST-CNN.git
-cd FashionMNIST-CNN
-pip install -r requirements.txt
+
