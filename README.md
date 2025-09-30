@@ -18,7 +18,7 @@ A Convolutional Neural Network (CNN) built with **PyTorch** to classify clothing
 
 | Metric         | Value |
 |----------------|-------|
-| Train Accuracy | ~92%  |
+| Train Accuracy | ~90%  |
 | Test Accuracy  | ~90%  |
 
 
