@@ -1,19 +1,56 @@
-## VoyageAI Weather-Trend Dataset Builder
-This script collects activity trend and weather data across 15 countries using SerpAPI (Google Trends) and Open Meteo APIs. 
-I built it as part of my VoyageAI recommendation system project to analyze how weather and seasonality influence tourism activities.
+## VoyageAI – Smart Travel Data Collection Pipeline
 
-To diversify efficiently the dataset, the Countries-States-Cities dataset from GitHub was used to extract the latitude and longitude of selected locations. Given the limited API resources, the pipeline focuses on four strategic regions for each of the fifteen most visited countries across five continents.
+This project is part of VoyageAI, an intelligent touristic activties recommendation system that combines weather, seasonal trends, and activity popularity across 15 countries.
 
-Using these coordinates, the system integrates SERP API and Open-Meteo API to gather regional data such as average trends, ratings, daily temperature, daily precipitation, maximum wind speed, and average daylight duration for every season. The processed results are then stored in a CSV file, creating a solid foundation for model training.
+I built this pipeline to automatically collect and merge different types of data, from climate (temperature, daylight, wind, precipitation) to Google Trends activity data like hiking, museum, beach, and more for the sake of training a model which finetuned parameters would be used to assign a score for a group of activities.
 
-Although the SERP API free plan limits the number of requests, the current setup provides enough data to build an MVP. The modular design also makes the pipeline adaptable according to the user's needs (updating the API plan or increasing the scope of the data sampling can be achieved with minimal changes).
+🧩 What This Pipeline Does
 
-Summary:
-  FULL ETL PIPELINE AND DATASET(CSV FORMAT)
-  FULL ETL PIPELINE FROM SCRATCH
-  Full data pipeline to train an ML Model. The parameters of the ml model will be used as metrics to assign a score for touristic activities in a larger recommendation system i am working on.
-  Tools used:
-  - SERP API(Google Trends and Google Map)
-  - Open meteo API
-  - GitHub csv (to get latitude and longitude): https://github.com/dr5hn/countries-states-cities-database/blob/master/csv/states.csv
-  Github Countries-States-Cities dataset: https://lnkd.in/eRJG2iYz 
+Pulls city coordinates(latitude and longitude) from a large open-source CSV (states.csv on GitHub)
+
+Fetches historical weather data from the Open-Meteo API
+
+Gets country-regions trend scores for 11 activity types using SerpAPI
+
+Get country-regions 
+
+Processes everything into a clean dataset (scoring_dataset.csv)
+
+⚙️ How It Works
+
+I wrote the code myself and used AI to improve the debugging and handle repetitive error cases.
+All the logic, API setup, and data strategy decisions were made by me.
+
+Taking into account the constraints:
+I selected 15 countries based on hemisphere and season types.
+I chose 11 activity types such as hiking, museum, cultural, shopping, and natural.
+I used seasonal data averages instead of daily data because daily calls would make too many API requests.
+I found a public GitHub CSV with coordinates for thousands of cities and adjusted names like Kyoto (which had an accent) so it would match correctly.
+I used my own API keys and designed all request parameters.
+Each data point combines trend score and average climate metrics to make the dataset more useful for model training.
+
+🧠 Design Choices
+
+Season-based sampling:
+Instead of fetching weather data day by day, I collected by season. It’s faster, cheaper, and still gives meaningful averages.
+
+Flexible structure:
+It’s easy to add more activities, countries, or seasons without changing the core logic.
+
+Readable and transparent:
+All errors and logs show what’s happening at each step, making debugging simple.
+
+🔑 APIs and Resources Used
+
+Open-Meteo Archive API for historical weather data
+
+SerpAPI (Google Trends) for activity popularity
+
+Countries–States–Cities CSV for latitude and longitude(https://github.com/dr5hn/countries-states-cities-database/blob/master/csv/states.csv
+  Github Countries-States-Cities dataset: https://lnkd.in/eRJG2iYz)
+
+🚀 Why I Built It This Way
+
+I wanted a clean, realistic dataset for training VoyageAI’s travel activity recommender.
+Instead of relying on pre-made datasets, I built a custom pipeline that adapts to real seasonal and geographic conditions.
+
