@@ -365,7 +365,11 @@ SEASON_DURATIONS = {
     "Malaysia": {"dry": 183, "wet": 182}
 }
 
-api_key = "13f2a805d42ddfcc8d08659f9575be190889058821e6d5899a1eef1c6f52537c"
+#######################################################
+#####REPLACE api_key WITH YOUR SERPAPI PRIVATE KEY#####
+#######################################################
+
+api_key = "REPLACE WITH YOUR SERPAPI PRIVATE KEY"
 github = "https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/csv/states.csv"
 
 # Usage
