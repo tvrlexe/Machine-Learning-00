@@ -12,7 +12,7 @@ Fetches historical weather data from the Open-Meteo API
 
 Gets country-regions trend scores for 11 activity types using SerpAPI(Google Trend)
 
-Processes everything into a clean dataset (scoring_dataset.csv)
+Processes everything into a clean dataset (regional_travel_dataset.csv)
 
 ⚙️ How It Works
 
