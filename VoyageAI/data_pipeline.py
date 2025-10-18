@@ -218,8 +218,8 @@ class Dataset():
                         print(f"Weather data collected")
                         
                         # Process 3 key activities per city/season
-                        key_activities = activities[:3]
-                        for activity in key_activities:
+                        
+                        for activity in activities:
                             print(f"Getting trends for '{activity}'...")
                             
                             trend_score = self.get_country_trends(activity, country, season)
@@ -333,9 +333,9 @@ activities = [
     "museum",
     "beach",
     "park",
-    "religious places",
+    "religious",
     "architecture",
-    "historic places",
+    "historic",
     "amusement",
     "cultural",
     "shopping",
@@ -365,11 +365,7 @@ SEASON_DURATIONS = {
     "Malaysia": {"dry": 183, "wet": 182}
 }
 
-#################################################
-##Replace api_key with you serp api private key##
-#################################################
-
-api_key = "REPLACE WITH YOUR OWN SERP API PRIVATE KEY"
+api_key = "13f2a805d42ddfcc8d08659f9575be190889058821e6d5899a1eef1c6f52537c"
 github = "https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/csv/states.csv"
 
 # Usage
@@ -387,7 +383,7 @@ complete_data = dataset.run_complete_data_collection()
 
 if len(complete_data) > 0:
     print(f"Success! Collected {len(complete_data)} data points")
-    complete_data.to_csv("regional_scoring_dataset.csv", index=False)
+    complete_data.to_csv("scoring_dataset.csv", index=False)
     print("Dataset saved as scoring_dataset.csv")
     print("\nSample data:")
     print(complete_data.head(10))
