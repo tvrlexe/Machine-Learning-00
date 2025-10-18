@@ -10,9 +10,9 @@ Pulls city coordinates(latitude and longitude) from a large open-source CSV (sta
 
 Fetches historical weather data from the Open-Meteo API
 
-Gets country-regions trend scores for 11 activity types using SerpAPI
+Gets country-regions trend scores for 11 activity types using SerpAPI(Google Trend)
 
-Get country-regions 
+Get country-regions average rating of 15 activities using SerpAPI(Google Map)
 
 Processes everything into a clean dataset (scoring_dataset.csv)
 
