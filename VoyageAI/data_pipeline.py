@@ -195,7 +195,7 @@ class Dataset():
                     print(f"Coordinates: {lat}, {lon}")
                     
                     # Process 2 main seasons per country
-                    seasons_to_process = list(self.countries_details[country].keys())[:2]
+                    seasons_to_process = list(self.countries_details[country].keys())[:4]
                     
                     for season in seasons_to_process:
                         print(f"Processing {season} season...")
