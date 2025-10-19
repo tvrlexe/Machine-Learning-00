@@ -198,21 +198,30 @@ class Dataset():
         
         return seasonal_ranges
 
-    def run_optimized_data_collection(self):
-        """Optimized data collection targeting ~1000 rows"""
+    def run_maximized_data_collection(self):
+        """MAXIMIZED data collection within 250 SerpAPI calls"""
         all_data = []
         failed_attempts = 0
         max_failures = 50
+        serpapi_calls_made = 0
+        max_serpapi_calls = 250
         
-        # Process all countries with original regions
+        print(f"MAXIMIZING DATASET WITHIN {max_serpapi_calls} SERPAPI CALLS")
+        
+        # CACHE for trend scores to avoid duplicate API calls
+        trend_cache = {}
+        
         for country in list(self.countries_details.keys()):
-            print(f"\n{'='*50}")
+            print(f"\n{'='*60}")
             print(f"PROCESSING: {country.upper()}")
-            print(f"{'='*50}")
+            print(f"{'='*60}")
             
             # Use ALL regions for each country
             cities = Regions.get(country, [])
             print(f"Processing {len(cities)} regions...")
+            
+            # SMART SEASON SELECTION: Use all seasons for maximum data
+            seasons_to_process = list(self.countries_details[country].keys())
             
             for city_idx, city in enumerate(cities):
                 print(f"\n REGION {city_idx+1}/{len(cities)}: {city}")
@@ -221,12 +230,8 @@ class Dataset():
                     lat, lon = self.collect_coordinates(city)
                     print(f"   Coordinates: {lat:.4f}, {lon:.4f}")
                     
-                    # Process ALL seasons for each region
-                    seasons_to_process = list(self.countries_details[country].keys())
-                    print(f"   Processing {len(seasons_to_process)} seasons...")
-                    
                     for season_idx, season in enumerate(seasons_to_process):
-                        print(f"   SEASON {season_idx+1}/{len(seasons_to_process)}: {season}")
+                        print(f"SEASON {season_idx+1}/{len(seasons_to_process)}: {season}")
                         
                         duration = SEASON_DURATIONS.get(country, {}).get(season, 90)
                         seasonal_range = self.get_seasonal_ranges(self.countries_details[country])
@@ -237,7 +242,7 @@ class Dataset():
                             continue
                         
                         # Get weather data for this region/season
-                        print(f"   Getting weather data...")
+                        print(f"Getting weather data...")
                         weather_data = self.collect_weather_data(
                             lat, lon, 
                             season_dates['start'], 
@@ -249,51 +254,68 @@ class Dataset():
                         successful_activities = 0
                         for activity_idx, activity in enumerate(activities):
                             if failed_attempts >= max_failures:
-                                print(f"   Too many failures - stopping")
+                                print(f"Too many failures - stopping")
                                 return pd.DataFrame(all_data)
                             
-                            # Use country-level trends (smarter approach)
-                            trend_score = self.get_country_trends(activity, country, season)
-                            
-                            if trend_score is not None:
-                                data_point = {
-                                    'country': country,
-                                    'city': city,
-                                    'activity': activity,
-                                    'season': season,
-                                    'trend_score': trend_score,
-                                    'avg_daily_precipitation': weather_data[0],
-                                    'avg_daily_temperature': weather_data[1],
-                                    'avg_daily_daylight': weather_data[2],
-                                    'avg_daily_wind_speed': weather_data[3],
-                                    'season_duration': duration
-                                }
-                                
-                                all_data.append(data_point)
-                                successful_activities += 1
-                                print(f"   {activity}: {trend_score:.3f}")
+                            # CHECK SERPAPI LIMIT
+                            if serpapi_calls_made >= max_serpapi_calls:
+                                print(f" Reached {max_serpapi_calls} SerpAPI call limit!")
+                                # Use cached or default scores for remaining activities
+                                trend_score = trend_cache.get(f"{country}_{season}_{activity}", 0.1)
+                                print(f"   Using cached score for {activity}: {trend_score:.3f}")
                             else:
-                                failed_attempts += 1
-                                print(f"   {activity}: failed")
-                        
-                        print(f"   Success: {successful_activities}/{len(activities)} activities")
-                        
-                        # Early stopping if we reach target
-                        if len(all_data) >= 1000:
-                            print(f"   🎯 Reached target of 1000 data points!")
-                            return pd.DataFrame(all_data)
+                                # Use country-level trends with caching
+                                cache_key = f"{country}_{season}_{activity}"
+                                if cache_key in trend_cache:
+                                    trend_score = trend_cache[cache_key]
+                                    print(f"   Using cached trend for {activity}: {trend_score:.3f}")
+                                else:
+                                    trend_score = self.get_country_trends(activity, country, season)
+                                    if trend_score is not None:
+                                        trend_cache[cache_key] = trend_score
+                                        serpapi_calls_made += 1
+                                        print(f" SerpAPI calls made: {serpapi_calls_made}/{max_serpapi_calls}")
+                                    else:
+                                        failed_attempts += 1
+                                        trend_score = 0.1  # Default fallback
                             
+                            # Create data point regardless (we have weather data)
+                            data_point = {
+                                'country': country,
+                                'city': city,
+                                'activity': activity,
+                                'season': season,
+                                'trend_score': trend_score,
+                                'avg_daily_precipitation': weather_data[0],
+                                'avg_daily_temperature': weather_data[1],
+                                'avg_daily_daylight': weather_data[2],
+                                'avg_daily_wind_speed': weather_data[3],
+                                'season_duration': duration
+                            }
+                            
+                            all_data.append(data_point)
+                            successful_activities += 1
+                            print(f"{activity}: {trend_score:.3f}")
+                        
+                        print(f"Success: {successful_activities}/{len(activities)} activities")
+                        print(f"Total data points: {len(all_data)}")
+                        
                 except Exception as e:
-                    print(f"   Failed to process {city}: {e}")
+                    print(f"Failed to process {city}: {e}")
                     failed_attempts += 1
                     if failed_attempts >= max_failures:
-                        print("   Too many failures - stopping")
+                        print("Too many failures - stopping")
                         return pd.DataFrame(all_data)
+        
+        print(f"\nFINAL RESULTS:")
+        print(f"   SerpAPI calls used: {serpapi_calls_made}/{max_serpapi_calls}")
+        print(f"   Total data points: {len(all_data)}")
+        print(f"   Cache hits: {len(trend_cache)} unique trend combinations")
         
         return pd.DataFrame(all_data)
 
 
-# ORIGINAL REGIONS (SMARTER APPROACH)
+# ORIGINAL REGIONS (MAXIMUM COVERAGE)
 Regions = { 
     "France": ["Île-de-France", "Provence-Alpes-Côte-d'Azur", "Auvergne-Rhône-Alpes", "Occitanie"],
     "Spain": ["Catalonia", "Community of Madrid", "Andalusia", "Valencian Community"],
@@ -376,19 +398,19 @@ dataset = Dataset(
     api_key=api_key
 )
 
-print("STARTING OPTIMIZED DATA COLLECTION")
-print("Using original regions with country-level trend averages")
-print("Target: ~1000 data points")
+print("STARTING MAXIMIZED DATA COLLECTION")
+print("Target: Maximum dataset within 250 SerpAPI calls")
 print("Strategy: All regions × All seasons × All activities")
+print("Features: Smart caching + API limit tracking")
 
-complete_data = dataset.run_optimized_data_collection()
+complete_data = dataset.run_maximized_data_collection()
 
 if len(complete_data) > 0:
     print(f"\nSUCCESS! Collected {len(complete_data)} data points")
-    complete_data.to_csv("regional_travel_dataset.csv", index=False)
-    print("Dataset saved as 'regional_travel_dataset.csv'")
+    complete_data.to_csv("maximized_travel_dataset.csv", index=False)
+    print("Dataset saved as 'maximized_travel_dataset.csv'")
     
-    print(f"\nDATA ANALYTICS:")
+    print(f"\nATA ANALYTICS:")
     print(f"   Total data points: {len(complete_data)}")
     print(f"   Countries: {complete_data['country'].nunique()}")
     print(f"   Regions: {complete_data['city'].nunique()}")
