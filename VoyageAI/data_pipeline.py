@@ -367,7 +367,7 @@ SEASON_DURATIONS = {
 
 
 
-api_key = "34e143a2f63e04ae6203fb0c5407eb7e1fee583979998d63e34580f50f0485a9"
+api_key = ""
 github = "https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/csv/states.csv"
 
 # Usage
